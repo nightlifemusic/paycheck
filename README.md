@@ -104,3 +104,52 @@ And the context would need to also be provided:
 
 At the point of login, skeptic takes a set of templates, substitutions and contexts, and publishes payload templates, which are free from any variables or functions.
 
+### functions
+
+```js
+skeptic = require('skeptic')
+skeptic.compile(templates, substitutions, contexts)
+.then((payloadTemplates) => {
+    storeInJWT(payloadTemplates)
+}).catch((err) => {
+
+});
+```
+
+```js
+skeptic = require('skeptic')
+
+function receivePayloads(payload, next) {
+    extractJWT(payload)
+    .then((payloadTemplates) => {
+        next(skeptic.check(payload, payloadTemplates))
+        
+    }).catch(PayloadDenied, (err) => {
+        // payload doesn't match templates
+    }).catch((err) => {
+        // other errors, eg JWT invalid
+    })
+}
+```
+
+```js
+skeptic = require('skeptic')
+
+skeptic.observeStart()
+
+function receivePayloads(payload, next) {
+    
+    skeptic.observe(
+        payload
+    )
+    
+}
+
+function finish() {
+    var resultingTemplates = skeptic.observeStop()
+    myDataStore.save(resultingTemplates)
+}
+
+```
+
+
