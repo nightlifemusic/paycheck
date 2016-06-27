@@ -104,8 +104,9 @@ And the context would need to also be provided:
 
 At the point of login, skeptic takes a set of templates, substitutions and contexts, and publishes payload templates, which are free from any variables or functions.
 
-### functions
+### Code examples 
 
+Compiling payload templates via login step
 ```js
 skeptic = require('skeptic')
 skeptic.compile(templates, substitutions, contexts)
@@ -116,14 +117,15 @@ skeptic.compile(templates, substitutions, contexts)
 });
 ```
 
+Checking payloads 
 ```js
 skeptic = require('skeptic')
 
 function receivePayloads(payload, next) {
     extractJWT(payload)
     .then((payloadTemplates) => {
-        next(skeptic.check(payload, payloadTemplates))
-        
+        var checkedPayload = skeptic.check(payload, payloadTemplates)
+        next(checkedPayload)
     }).catch(PayloadDenied, (err) => {
         // payload doesn't match templates
     }).catch((err) => {
