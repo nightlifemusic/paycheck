@@ -1,0 +1,22 @@
+{
+  "name": "skeptic",
+  "version": "0.0.1",
+  "description": "JSON payload authorization middleware",
+  "main": "skeptic.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/nightlifemusic/skeptic.git"
+  },
+  "author": "Rene Wooller",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/nightlifemusic/skeptic#readme",
+  "devDependencies": {
+    "mocha": "^2.5.3"
+  }
+}
