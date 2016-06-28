@@ -26,7 +26,7 @@ var payloadsDeepArrays = [
 Object.freeze(payloadsAllTypes);
 
 describe('paycheck', function () {
-    describe('unit', function () {
+    describe('match', function () {
         this.timeout(60000);
 
         it('should be able to match payloads to template with wildcards', function (done) {
