@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+			"name": "paycheck unit test",
+			"type": "node",
+			"program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
+			"stopOnEntry": false,
+			"runtimeArgs":[
+				"--nolazy" 
+			],
+			"args": ["--no-exit", "tests/paycheck-test.js"],
+			"cwd": "${workspaceRoot}",
+			"runtimeExecutable": null,
+			"env": {}
+		}
+    ]
+}

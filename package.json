@@ -1,13 +1,13 @@
 {
-  "name": "skeptic",
+  "name": "paycheck",
   "version": "0.0.1",
   "description": "JSON payload authorization middleware",
-  "main": "skeptic.js",
+  "main": "paycheck.js",
   "directories": {
     "test": "tests"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha tests/paycheck-test.js"
   },
   "repository": {
     "type": "git",
@@ -17,6 +17,12 @@
   "license": "ISC",
   "homepage": "https://bitbucket.org/nightlifemusic/skeptic#readme",
   "devDependencies": {
+    "chai": "^3.5.0",
     "mocha": "^2.5.3"
+  },
+  "dependencies": {
+    "jsondiffpatch": "^0.1.43",
+    "lodash": "^4.13.1",
+    "lodash-deep": "^2.0.0"
   }
 }
