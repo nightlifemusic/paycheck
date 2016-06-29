@@ -1,8 +1,6 @@
 "use strict";
 var _ = require('lodash')
-
 _.mixin(require("lodash-deep"));
-
 var jdp = require('jsondiffpatch')
 
 var PayCheck = class PayCheck {
@@ -12,9 +10,23 @@ var PayCheck = class PayCheck {
         })
     }
 
-    compile(payloads, substitutions, contexts) {
+    compile(templates, substitutions, contexts) {
+         
+        var toRet = templates.reduce((p, c, i, a) => {
+            var toSet = c;
+            var path = _.flatMap(c)[this.opts.pathKey];
+            var arr = (_.get(p, path) || []).push(toSet)
+
+            //TODO substitution toSet
+
+            arr.push(toSet)
+            _.set(p, path, toSet) 
+        }, {})
 
     }
+
+
+
 
     match(payloadIn, payloadTemplate) {
         var payload = _.cloneDeep(payloadIn);
