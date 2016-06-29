@@ -1,4 +1,4 @@
-var paycheck = require('../paycheck.js')({})
+var paycheck = new (require('../paycheck.js'))({})
 var assert = require("assert");
 var expect = require("chai").expect;
 var _ = require('lodash')
