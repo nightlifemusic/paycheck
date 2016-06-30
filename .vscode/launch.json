@@ -26,6 +26,19 @@
 			"cwd": "${workspaceRoot}",
 			"runtimeExecutable": null,
 			"env": {}
+		},
+        {
+			"name": "paycheck unit compile test",
+			"type": "node",
+			"program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
+			"stopOnEntry": false,
+			"runtimeArgs":[
+				"--nolazy" 
+			],
+			"args": ["--no-exit", "tests/paycheck-compile-test.js"],
+			"cwd": "${workspaceRoot}",
+			"runtimeExecutable": null,
+			"env": {}
 		}
     ]
 }
