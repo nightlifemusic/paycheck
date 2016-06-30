@@ -19,21 +19,31 @@ var PayCheck = class PayCheck {
         var substitutions = this.mergeCompileData(substitutionsArr);
         var context = this.mergeCompileData(contextsArr);
         
-        //TODO modify this to run the substitutions first
+        // retrieve the current substitutions
+        return Promise.resolve()
+        .then(() => {
+            return this.resolveDynamicSubstitutions(substitutions, context);
+        }).then((substitutionsStatic) => {
+            return Promise.reduce(templatesArr, (p, c) => {
+                var subbed = this.substituteTemplate(c, substitutionsStatic);
+                
+                var path = _.flatMap(c)[0][this.opts.pathKey];
+                var arr = (_.get(p, path) || [])
+                arr.push(subbed)
+                _.set(p, path, arr)
+
+                return p;
+            }, {})
+        })
         
+    }
 
-        //todo return promise with template in it
-        return Promise.reduce(templatesArr, (p, c) => {
-            var subbed = this.substituteTemplate(c, substitutions, context);
-            
-            var path = _.flatMap(c)[0][this.opts.pathKey];
-            var arr = (_.get(p, path) || [])
-            arr.push(subbed)
-            _.set(p, path, arr)
-
-            return p;
-        }, {})
-
+    resolveDynamicSubstitutions(substitutions, context) {
+        return Promise.map(substitutions, (sub) => {
+            if (_.isFunction(sub)) {
+                return sub.call(context) //if the substitution is dynamic, execute it
+            } else  return sub
+        })
     }
 
     mergeCompileData(arr) {
@@ -42,39 +52,16 @@ var PayCheck = class PayCheck {
         return _.merge.apply(null, arrc)
     }
 
-    substituteTemplate(template, substitutions, context) {
-        var templateCopy = _.cloneDeep(template)
-        var promises = [];
-        var templateUnresolved = _.deepMapValues(templateCopy, (v, p) => {
+    substituteTemplate(template, substitutions) {
+        return _.deepMapValues(template, (v, p) => {
             if (_.isString(v)) {
                 var regMatch = v.match(/<%= *(\w+) *%>/)
                 if (regMatch != null && regMatch.length == 2) { // 2 indicates a capture
-                    var subUnresolved = this.createSubstitution(substitutions[regMatch[1]], context) // this may be a promise
-                    if(typeof subUnresolved.then === 'function') { // if it is a promise
-                        promises.push(subUnresolve)
-                    } else return subUnresolved;
+                    if (regMatch[1]) return regMatch[1]
+                    else throw new SubstitutionError(`template parameter ${regMatch[1]} not found in substitution: ${JSON.stringify(substitutions)}`);
                 } else return v;
             } else return v;
         })
-
-        return Promise.all(promises).then((res) => {
-            return _.deepMapValues(templateUnresolved, (v, p) => {
-                if(typeof v.then === 'function') {
-                    return v.value()
-                } else return v;
-            })
-        })
-
-    }
-
-    createSubstitution(match, context) {
-        if (match) {
-            if (_.isFunction(match)) {
-                return match.call(context) //if the substitution is dynamic, execute it
-            } else  return match
-        } else {
-            throw new SubstitutionError(`template parameter ${regMatch[1]} not found in substitution: ${JSON.stringify(substitutions)}`);
-        }
     }
 
     match(payloadIn, payloadTemplate) {
