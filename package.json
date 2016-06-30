@@ -23,6 +23,7 @@
     "sinon-chai": "^2.8.0"
   },
   "dependencies": {
+    "bluebird": "^3.4.1",
     "jsondiffpatch": "^0.1.43",
     "lodash": "^4.13.1",
     "lodash-deep": "^2.0.0"

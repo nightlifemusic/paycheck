@@ -1,4 +1,5 @@
 "use strict";
+var Promise = require('bluebird')
 var _ = require('lodash')
 _.mixin(require("lodash-deep"));
 var jdp = require('jsondiffpatch')
@@ -18,8 +19,11 @@ var PayCheck = class PayCheck {
         var substitutions = this.mergeCompileData(substitutionsArr);
         var context = this.mergeCompileData(contextsArr);
         
-        var templates = templatesArr.reduce((p, c, i, a) => {
+        //TODO modify this to run the substitutions first
+        
 
+        //todo return promise with template in it
+        return Promise.reduce(templatesArr, (p, c) => {
             var subbed = this.substituteTemplate(c, substitutions, context);
             
             var path = _.flatMap(c)[0][this.opts.pathKey];
@@ -30,7 +34,6 @@ var PayCheck = class PayCheck {
             return p;
         }, {})
 
-        return templates;
     }
 
     mergeCompileData(arr) {
@@ -41,20 +44,34 @@ var PayCheck = class PayCheck {
 
     substituteTemplate(template, substitutions, context) {
         var templateCopy = _.cloneDeep(template)
-        return _.deepMapValues(templateCopy, (v, p) => {
+        var promises = [];
+        var templateUnresolved = _.deepMapValues(templateCopy, (v, p) => {
             if (_.isString(v)) {
                 var regMatch = v.match(/<%= *(\w+) *%>/)
                 if (regMatch != null && regMatch.length == 2) { // 2 indicates a capture
-                    return this.createSubstitution(substitutions[regMatch[1]], context)
+                    var subUnresolved = this.createSubstitution(substitutions[regMatch[1]], context) // this may be a promise
+                    if(typeof subUnresolved.then === 'function') { // if it is a promise
+                        promises.push(subUnresolve)
+                    } else return subUnresolved;
                 } else return v;
             } else return v;
         })
+
+        return Promise.all(promises).then((res) => {
+            return _.deepMapValues(templateUnresolved, (v, p) => {
+                if(typeof v.then === 'function') {
+                    return v.value()
+                } else return v;
+            })
+        })
+
     }
 
     createSubstitution(match, context) {
         if (match) {
-            if (_.isFunction(match)) return match.call(context) //if the substitution is dynamic, execute it
-            else  return match
+            if (_.isFunction(match)) {
+                return match.call(context) //if the substitution is dynamic, execute it
+            } else  return match
         } else {
             throw new SubstitutionError(`template parameter ${regMatch[1]} not found in substitution: ${JSON.stringify(substitutions)}`);
         }
