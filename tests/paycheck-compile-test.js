@@ -54,16 +54,16 @@ Object.freeze(baseTemplates);
 var substitutions = [
     { "sub": ["f", "g", "h", "i"] },
     {
-        "subComp": () => {
-            if (this.contextQualifier === "firstContext") return Promise.delay(2000).resolve("first")
-            else if (this.contextQualifier === "secondContext") return Promise.delay(2000).resolve(["secondA", "secondB"])
-            else return Promise.resolve(["third"])
+        "subComp": function () {
+            if (this.contextQualifier === "firstContext") return Promise.resolve("first").delay(2000)
+            else if (this.contextQualifier === "secondContext") return Promise.resolve(["secondA", "secondB"]).delay(2000)
+            else return Promise.resolve(["third"]).delay(2000)
         }
     },
     {
-        "subCompOther": () => {
-            if (this.otherQualifier === "otherQualifierValue") return Promise.delay(2000).resolve("hasOtherQualifierValue")
-            else return Promise.resolve("doesNotHaveOtherQualifierValue")
+        "subCompOther": function () {
+            if (this.otherQualifier === "otherQualifierValue") return Promise.resolve("hasOtherQualifierValue").delay(2000)
+            else return Promise.resolve("doesNotHaveOtherQualifierValue").delay(2000)
         }
     }
 ]
@@ -79,6 +79,14 @@ var contexts = [
 ]
 
 Object.freeze(contexts);
+
+var expectedResolvedSubstitutions = {
+    "sub": ["f", "g", "h", "i"],
+    "subComp": ["secondA", "secondB"],
+    "subCompOther": "hasOtherQualifierValue"    
+}
+
+Object.freeze(expectedResolvedSubstitutions);
 
 var expectedTemplates = {
     service: {
@@ -171,13 +179,13 @@ describe('paycheck', function () {
 
         })
 
-        it.only('should be able to substitute a template with a dynamic substitution', function (done) {
+        it('should be able to resolve dynamic substitutions', function (done) {
             var subs = paycheck.mergeCompileData(substitutions)
             var con = paycheck.mergeCompileData(contexts)
 
-            paycheck.substituteTemplate(baseTemplates[3], subs, con)
-            .then((substituted) => {
-                expect(substituted).to.deep.equal(expectedTemplates.service.controller.function[2])
+            paycheck.resolveDynamicSubstitutions(subs, con)
+            .then((substitutionsStatic) => {
+                expect(substitutionsStatic).to.deep.equal(expectedResolvedSubstitutions)
                 done();
             })
              

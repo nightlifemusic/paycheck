@@ -20,8 +20,7 @@ var PayCheck = class PayCheck {
         var context = this.mergeCompileData(contextsArr);
         
         // retrieve the current substitutions
-        return Promise.resolve()
-        .then(() => {
+        return Promise.resolve().then(() => {
             return this.resolveDynamicSubstitutions(substitutions, context);
         }).then((substitutionsStatic) => {
             return Promise.reduce(templatesArr, (p, c) => {
@@ -35,15 +34,25 @@ var PayCheck = class PayCheck {
                 return p;
             }, {})
         })
-        
     }
 
     resolveDynamicSubstitutions(substitutions, context) {
-        return Promise.map(substitutions, (sub) => {
+        var keys = [];
+        // convert values to array
+        var arrSubs = _.flatMap(substitutions, (v, k) => {
+            keys.push(k); // store the keys
+            return  [v];
+        }) 
+        
+        return Promise.map(arrSubs, (sub) => { 
             if (_.isFunction(sub)) {
-                return sub.call(context) //if the substitution is dynamic, execute it
-            } else  return sub
-        })
+                sub = sub.call(context) //if the value is dynamic, execute it
+                return sub;  
+            } else return sub
+        }).reduce((p, c, i) => { // executed promises will be resolved at this point
+            p[keys[i]] = c; // add the resolved values back into an object
+            return p;
+        },{})
     }
 
     mergeCompileData(arr) {
@@ -57,7 +66,7 @@ var PayCheck = class PayCheck {
             if (_.isString(v)) {
                 var regMatch = v.match(/<%= *(\w+) *%>/)
                 if (regMatch != null && regMatch.length == 2) { // 2 indicates a capture
-                    if (regMatch[1]) return regMatch[1]
+                    if (regMatch[1]) return substitutions(regMatch[1])
                     else throw new SubstitutionError(`template parameter ${regMatch[1]} not found in substitution: ${JSON.stringify(substitutions)}`);
                 } else return v;
             } else return v;
