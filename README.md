@@ -1,4 +1,4 @@
-# Skeptic - a JSON payload authorization middleware
+# PayCheck - a JSON payload authorization middleware
 
 Lightweight, low footprint, compatible with any storage and server mechanism, allowing code reuse between frontend and backend. 
 
@@ -8,16 +8,16 @@ A backend API receives payloads. For example, an express server, websocket serve
 
 Different users and/or user roles or groups are authorized to send different types of payloads with different sets of parameters and values. You heard right - this isn't just about routes, it's also about authorizing resources.
 
-As part of the login process, skeptic can be invoked to generate a JSON object containing templates of expected payloads and the associated routes or JSON RPC methods. This can be stored by the invoking application, for example in a signed JSON Web Token, or redis. 
+As part of the login process, PayCheck can be invoked to generate a JSON object containing templates of expected payloads and the associated routes or JSON RPC methods. This can be stored by the invoking application, for example in a signed JSON Web Token, or redis. 
 
-For subsequent requests, skeptic can be invoked to check the incoming payload against the templates generated earlier. Skeptic either rejects or accepts the payload based on if the template can be matched.
+For subsequent requests, PayCheck can be invoked to check the incoming payload against the templates generated earlier. PayCheck either rejects or accepts the payload based on if the template can be matched.
 
 How do the JSON payload templates get specified in the first place?
 
 ### Payload templates
 
 Payload templates are compiled from 'templates', 'substitutions' and 'contexts' that are all associated with the user who is logging in. 
-Basic templates can be created automatically by Skeptic via the 'listening' mode. After this, specific features can be edited manually.  
+Basic templates can be created automatically by PayCheck via the 'listening' mode. After this, specific features can be edited manually.  
 Templates, substitution and contexts can be stored and retrieved using any kind of datastore. Dynamic substitutions that run code are hard coded by the app.
 
 Simple templates have no variables, only fixed values and wildcards: 
@@ -102,14 +102,14 @@ And the context would need to also be provided:
 }
 ```
 
-At the point of login, skeptic takes a set of templates, substitutions and contexts, and publishes payload templates, which are free from any variables or functions.
+At the point of login, PayCheck takes a set of templates, substitutions and contexts, and publishes payload templates, which are free from any variables or functions.
 
 ### Code examples 
 
 Compiling payload templates via login step
 ```js
-skeptic = require('skeptic')
-skeptic.compile(templates, substitutions, contexts)
+PayCheck = require('PayCheck')
+PayCheck.compile(templates, substitutions, contexts)
 .then((payloadTemplates) => {
     storeInJWT(payloadTemplates)
 }).catch((err) => {
@@ -119,12 +119,12 @@ skeptic.compile(templates, substitutions, contexts)
 
 Checking payloads 
 ```js
-skeptic = require('skeptic')
+PayCheck = require('PayCheck')
 
 function receivePayloads(payload, next) {
     extractJWT(payload)
     .then((payloadTemplates) => {
-        var checkedPayload = skeptic.check(payload, payloadTemplates)
+        var checkedPayload = PayCheck.check(payload, payloadTemplates)
         next(checkedPayload)
     }).catch(PayloadDenied, (err) => {
         // payload doesn't match templates
@@ -135,20 +135,20 @@ function receivePayloads(payload, next) {
 ```
 
 ```js
-skeptic = require('skeptic')
+PayCheck = require('PayCheck')
 
-skeptic.observeStart()
+PayCheck.observeStart()
 
 function receivePayloads(payload, next) {
     
-    skeptic.observe(
+    PayCheck.observe(
         payload
     )
     
 }
 
 function finish() {
-    var resultingTemplates = skeptic.observeStop()
+    var resultingTemplates = PayCheck.observeStop()
     myDataStore.save(resultingTemplates)
 }
 
