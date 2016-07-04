@@ -11,11 +11,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@bitbucket.org/nightlifemusic/skeptic.git"
+    "url": "git+ssh://git@github.com:nightlifemusic/paycheck.git"
   },
   "author": "Rene Wooller",
-  "license": "ISC",
-  "homepage": "https://bitbucket.org/nightlifemusic/skeptic#readme",
+  "license": "GGPL3",
+  "homepage": "https://github.com/nightlifemusic/paycheck",
   "devDependencies": {
     "chai": "^3.5.0",
     "mocha": "^2.5.3",

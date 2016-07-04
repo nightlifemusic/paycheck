@@ -108,8 +108,8 @@ At the point of login, PayCheck takes a set of templates, substitutions and cont
 
 Compiling payload templates via login step
 ```js
-PayCheck = require('PayCheck')
-PayCheck.compile(templates, substitutions, contexts)
+var paycheck = new (require('../paycheck.js'))({})
+paycheck.compile(templates, substitutions, contexts)
 .then((payloadTemplates) => {
     storeInJWT(payloadTemplates)
 }).catch((err) => {
@@ -119,12 +119,12 @@ PayCheck.compile(templates, substitutions, contexts)
 
 Checking payloads 
 ```js
-PayCheck = require('PayCheck')
+var paycheck = new (require('../paycheck.js'))({})
 
 function receivePayloads(payload, next) {
     extractJWT(payload)
     .then((payloadTemplates) => {
-        var checkedPayload = PayCheck.check(payload, payloadTemplates)
+        var checkedPayload = paycheck.check(payload, payloadTemplates)
         next(checkedPayload)
     }).catch(PayloadDenied, (err) => {
         // payload doesn't match templates
@@ -134,22 +134,27 @@ function receivePayloads(payload, next) {
 }
 ```
 
-```js
-PayCheck = require('PayCheck')
 
-PayCheck.observeStart()
+Listening for payloads, converting them into payload templates.  
+
+```js
+var paycheck = new (require('../paycheck.js'))({})
+
+paycheck.listenStart()
 
 function receivePayloads(payload, next) {
     
-    PayCheck.observe(
+    paycheck.observe(
         payload
     )
     
 }
 
 function finish() {
-    var resultingTemplates = PayCheck.observeStop()
-    myDataStore.save(resultingTemplates)
+    var resultingTemplates = paycheck.observed; 
+    paycheck.listenStop()   
+    paycheck.observed = {};
+    myDataStore.save(resultingTemplates) // TODO: these need to be converted into an array of payload templates for easier storage
 }
 
 ```
