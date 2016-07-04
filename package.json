@@ -7,7 +7,7 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "mocha tests/paycheck-test.js"
+    "test": "mocha tests"
   },
   "repository": {
     "type": "git",
