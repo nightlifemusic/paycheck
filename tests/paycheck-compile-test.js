@@ -150,24 +150,24 @@ describe('paycheck', function () {
 
         })
 
-        xit('should be able to compile templates, just the compile step', function (done) {
+        // it('should be able to compile templates, just the compile step', function (done) {
 
-            var substituteTemplateStub = sinon.stub(paycheck, 'substituteTemplate')
-            substituteTemplateStub.returns(expectedTemplates.service.controller.function[0])
+        //     var substituteTemplateStub = sinon.stub(paycheck, 'substituteTemplate')
+        //     substituteTemplateStub.returns(expectedTemplates.service.controller.function[0])
 
-            var compiledTemplates = paycheck.compile(baseTemplates, substitutions, contexts)
+        //     var compiledTemplates = paycheck.compile(baseTemplates, substitutions, contexts)
 
-            expect(compiledTemplates).to.exist
-            expect(compiledTemplates.service.controller.function).to.exist
-            expect(compiledTemplates.service.controller.function.length).to.equal(3)
-            expect(compiledTemplates.service.controller.functionB).to.exist
-            expect(compiledTemplates.service.controller.functionB.length).to.equal(1)
+        //     expect(compiledTemplates).to.exist
+        //     expect(compiledTemplates.service.controller.function).to.exist
+        //     expect(compiledTemplates.service.controller.function.length).to.equal(3)
+        //     expect(compiledTemplates.service.controller.functionB).to.exist
+        //     expect(compiledTemplates.service.controller.functionB.length).to.equal(1)
 
-            substituteTemplateStub.release(); // important
+        //     substituteTemplateStub.release(); // important
 
-            done()
+        //     done()
 
-        })
+        // })
 
         it('should be able to substitute a template with a static substitution', function (done) {
             var subs = paycheck.mergeCompileData(substitutions)
@@ -180,28 +180,16 @@ describe('paycheck', function () {
         })
 
         it('should be able to resolve dynamic substitutions', function (done) {
-            var subs = paycheck.mergeCompileData(substitutions)
+            //var subs = paycheck.mergeCompileData(substitutions)
             var con = paycheck.mergeCompileData(contexts)
 
-            paycheck.resolveDynamicSubstitutions(subs, con)
+            paycheck.resolveDynamicSubstitutions(substitutions, con)
             .then((substitutionsStatic) => {
                 expect(substitutionsStatic).to.deep.equal(expectedResolvedSubstitutions)
                 done();
             })
              
         })
-
-        it('should be able to merge compile data', function (done) {
-            var merged = paycheck.mergeCompileData(substitutions);
-
-            expect(merged).to.exist
-            expect(merged.sub).to.deep.equal(["f", "g", "h", "i"])
-            expect(merged.subComp).to.be.a.function;
-            expect(merged.subCompOther).to.be.a.function;
-
-            done()
-        })
-
 
     })// describe
 })
