@@ -24,7 +24,7 @@ var PayCheck = class PayCheck {
         return Promise.resolve().then(() => {
             return this.resolveDynamicSubstitutions(substitutionsArr, context);
         }).then((substitutionsStatic) => {
-            return substituteTemplates(templatesArr, substitutionsStatic)
+            return this.substituteTemplates(templatesArr, substitutionsStatic)
         })
     }
 
@@ -55,7 +55,7 @@ var PayCheck = class PayCheck {
         return _.merge.apply(null, arrc)
     }
 
-    substituteTemplates(substitutionsStatic) {
+    substituteTemplates(templatesArr, substitutionsStatic) {
         return Promise.reduce(templatesArr, (p, c) => {
             var subbed = this.substituteTemplate(c, substitutionsStatic);
             

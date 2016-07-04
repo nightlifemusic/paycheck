@@ -44,7 +44,7 @@ var baseTemplates = [
             jsonrpc: '2.0',
             method: 'service.controller.function',
             id: "<%=*%>",
-            params: { "a": "<%=*%>", "c": { "d": { "e": "<%= subComp %>", "f": "<%= subCompOther" } } }
+            params: { "a": "<%=*%>", "c": { "d": { "e": "<%= subComp %>", "f": "<%= subCompOther %>" } } }
         }
     }
 ]
@@ -116,7 +116,7 @@ var expectedTemplates = {
                         jsonrpc: '2.0',
                         method: 'service.controller.function',
                         id: "<%=*%>",
-                        params: { "a": "<%=*%>", "c": { "d": { "e": ["secondA", "secondB"] } } }
+                        params: { "a": "<%=*%>", "c": { "d": { "e": ["secondA", "secondB"], "f" : "hasOtherQualifierValue" } } }
                     }
                 }
             ],
@@ -140,34 +140,42 @@ describe('paycheck', function () {
     describe('check', function () {
         this.timeout(60000);
 
-        xit('should be able fully compile templates from base templates, substitutions and contexts', function (done) {
+        it('should be able fully compile templates from base templates, substitutions and contexts', function (done) {
 
             paycheck.compile(baseTemplates, substitutions, contexts)
                 .then((compiledTemplates) => {
-                    expect(compiledTemplates).to.deep.equal(expectedTemplates);
+                    expect(compiledTemplates.service.controller.function[0]).to.deep.equal(expectedTemplates.service.controller.function[0])
+                    expect(compiledTemplates.service.controller.function[1]).to.deep.equal(expectedTemplates.service.controller.function[1])
+                    expect(compiledTemplates.service.controller.function[2]).to.deep.equal(expectedTemplates.service.controller.function[2])
+                    expect(compiledTemplates.service.controller.functionB).to.deep.equal(expectedTemplates.service.controller.functionB)
+                    
                     done();
                 })
 
         })
 
-        // it('should be able to compile templates, just the compile step', function (done) {
+        it('should fail with incomplete templates', function (done) {
 
-        //     var substituteTemplateStub = sinon.stub(paycheck, 'substituteTemplate')
-        //     substituteTemplateStub.returns(expectedTemplates.service.controller.function[0])
+            var brokenBaseTemplates = _.cloneDeep(baseTemplates);
+            brokenBaseTemplates[2].subTemplate.params.c.d.e = "<%= sub %" // break it
+            paycheck.compile(brokenBaseTemplates, substitutions, contexts)
+                .then((compiledTemplates) => {
+                    expect(compiledTemplates.service.controller.function[0]).to.deep.equal(expectedTemplates.service.controller.function[0])
+                    expect(compiledTemplates.service.controller.function[1].subTemplate).to.deep.equal(
+                        {
+                            jsonrpc: '2.0',
+                            method: 'service.controller.function',
+                            id: "<%=*%>",
+                            params: { "a": "<%=*%>", "c": { "d": { "e": "<%= sub %" } } }
+                        }
+                    )
+                    expect(compiledTemplates.service.controller.function[2]).to.deep.equal(expectedTemplates.service.controller.function[2])
+                    expect(compiledTemplates.service.controller.functionB).to.deep.equal(expectedTemplates.service.controller.functionB)
+                    
+                    done();
+                })
 
-        //     var compiledTemplates = paycheck.compile(baseTemplates, substitutions, contexts)
-
-        //     expect(compiledTemplates).to.exist
-        //     expect(compiledTemplates.service.controller.function).to.exist
-        //     expect(compiledTemplates.service.controller.function.length).to.equal(3)
-        //     expect(compiledTemplates.service.controller.functionB).to.exist
-        //     expect(compiledTemplates.service.controller.functionB.length).to.equal(1)
-
-        //     substituteTemplateStub.release(); // important
-
-        //     done()
-
-        // })
+        })
 
         it('should be able to substitute a template with a static substitution', function (done) {
             var subs = paycheck.mergeCompileData(substitutions)
