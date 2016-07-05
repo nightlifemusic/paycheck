@@ -16,7 +16,8 @@ var payloads =
         { "method" : "service.controller.method", "a": { "b": {"c": "vdvar"}}, "a2": "a2bvar3"},
         { "method" : "service.controller.method", "a3" : "va3"},
         { "method" : "service.controller.method", "a3" : ["va3var", "va3var2"]},
-        { "method" : "service.controller.method", "a3" : [{"b3": "vb3"}, {"c3" : "vc3"}]}
+        { "method" : "service.controller.method", "a3" : [{"b3": "vb3"}, {"c3" : "vc3"}]},
+        { "method" : "service.controller.otherMethod", "a3" : [{"b3": "vb3"}, {"c3" : "vc3"}]}
     ]
 
 Object.freeze(payloads);
@@ -185,6 +186,41 @@ describe('paycheck', function () {
             //
             paycheck.observe(payloads[i++]);
             expect(paycheck.observed).to.deep.equal(exp)
+
+            //
+            paycheck.observe(payloads[i++]);
+            var exp = {
+                "service" : {
+                    "controller" : {
+                        "method" : [
+                            { "method" : "service.controller.method", "a": "<%=*%>"},
+                            { "method" : "service.controller.method", "a": { "b": "<%=*%>" }},
+                            { "method" : "service.controller.method", "a": { "b": "vabvar"}, "a2" : "va2"},
+                            { "method" : "service.controller.method", "a": { "b": {"c": "<%=*%>"}}, "a2": "<%=*%>"},
+                            { "method" : "service.controller.method", "a3" : "<%=*%>"},
+                        ],
+                        "otherMethod" : [
+                            { "method" : "service.controller.otherMethod", "a3" : [{"b3": "vb3"}, {"c3" : "vc3"}]}
+                        ]
+                    }
+                }   
+            }
+
+            var arr = paycheck.listenStop();
+            var expArr = 
+            [
+                { "method" : "service.controller.method", "a": "<%=*%>"},
+                { "method" : "service.controller.method", "a": { "b": "<%=*%>" }},
+                { "method" : "service.controller.method", "a": { "b": "vabvar"}, "a2" : "va2"},
+                { "method" : "service.controller.method", "a": { "b": {"c": "<%=*%>"}}, "a2": "<%=*%>"},
+                { "method" : "service.controller.method", "a3" : "<%=*%>"},
+                { "method" : "service.controller.otherMethod", "a3" : [{"b3": "vb3"}, {"c3" : "vc3"}]}
+            ]
+
+            expect(arr).to.deep.equal(expArr);
+            expect(paycheck.isListening).to.be.false;
+            expect(paycheck.observed).to.be.empty;
+            expect(paycheck.observedPaths).to.be.empty;
 
             done();
         })

@@ -14,6 +14,7 @@ var PayCheck = class PayCheck {
         })
         this.isListening = false;
         this.observed = {};
+        this.observedPaths = [];
     }
 
     compile(templatesArr, substitutionsArr, contextsArr) {
@@ -108,6 +109,12 @@ var PayCheck = class PayCheck {
 
     listenStop() {
         this.isListening = false;
+        var toRet = this.observedPaths.map((v) => {
+            return _.get(this.observed, v)
+        })
+        this.observed = {}
+        this.observedPaths.length = 0;
+        return _.flatMap(toRet);
     }
 
     observe(payload) {
@@ -134,6 +141,7 @@ var PayCheck = class PayCheck {
                 }
             } else { // if the payload couldn't be merged into the existing structure, append it
                 _.set(this.observed, payload[this.opts.pathKey], [payload])
+                this.observedPaths.push(payload[this.opts.pathKey])
             }
         }
     }
