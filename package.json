@@ -14,7 +14,7 @@
     "url": "git+ssh://git@github.com:nightlifemusic/paycheck.git"
   },
   "author": "Rene Wooller",
-  "license": "GGPL3",
+  "license": "GPL-3",
   "homepage": "https://github.com/nightlifemusic/paycheck",
   "devDependencies": {
     "chai": "^3.5.0",
