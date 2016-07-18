@@ -91,45 +91,38 @@ Object.freeze(expectedResolvedSubstitutions);
 var expectedTemplates = {
     service: {
         controller: {
-            function: [
+            function: {
+                myTemplate:
                 {
-                    myTemplate:
-                    {
-                        jsonrpc: '2.0',
-                        method: 'service.controller.function',
-                        id: "<%=*%>",
-                        params: { "a": "<%=*%>", "c": { "d": { "e": ["f", "g"] } } }
-                    }
+                    jsonrpc: '2.0',
+                    method: 'service.controller.function',
+                    id: "<%=*%>",
+                    params: { "a": "<%=*%>", "c": { "d": { "e": ["f", "g"] } } }
                 },
+                subTemplate:
                 {
-                    subTemplate:
-                    {
-                        jsonrpc: '2.0',
-                        method: 'service.controller.function',
-                        id: "<%=*%>",
-                        params: { "a": "<%=*%>", "c": { "d": { "e": ["f", "g", "h", "i"] } } }
-                    }
+                    jsonrpc: '2.0',
+                    method: 'service.controller.function',
+                    id: "<%=*%>",
+                    params: { "a": "<%=*%>", "c": { "d": { "e": ["f", "g", "h", "i"] } } }
                 },
+                subCompTemplate:
                 {
-                    subCompTemplate:
-                    {
-                        jsonrpc: '2.0',
-                        method: 'service.controller.function',
-                        id: "<%=*%>",
-                        params: { "a": "<%=*%>", "c": { "d": { "e": ["secondA", "secondB"], "f" : "hasOtherQualifierValue" } } }
-                    }
+                    jsonrpc: '2.0',
+                    method: 'service.controller.function',
+                    id: "<%=*%>",
+                    params: { "a": "<%=*%>", "c": { "d": { "e": ["secondA", "secondB"], "f" : "hasOtherQualifierValue" } } }
                 }
-            ],
-            functionB: [
+            },
+            functionB: {
+                myTemplate:
                 {
-                    myTemplate:
-                    {
-                        jsonrpc: '2.0',
-                        method: 'service.controller.functionB',
-                        id: "<%=*%>",
-                        params: { "a": "<%=*%>", "c": { "d": { "e": ["f", "g"] } } }
-                    }
-                }]
+                    jsonrpc: '2.0',
+                    method: 'service.controller.functionB',
+                    id: "<%=*%>",
+                    params: { "a": "<%=*%>", "c": { "d": { "e": ["f", "g"] } } }
+                }
+            }
         }
     }
 }
@@ -144,14 +137,11 @@ describe('paycheck', function () {
 
             paycheck.compile(baseTemplates, substitutions, contexts)
                 .then((compiledTemplates) => {
-                    expect(compiledTemplates.service.controller.function[0]).to.deep.equal(expectedTemplates.service.controller.function[0])
-                    expect(compiledTemplates.service.controller.function[1]).to.deep.equal(expectedTemplates.service.controller.function[1])
-                    expect(compiledTemplates.service.controller.function[2]).to.deep.equal(expectedTemplates.service.controller.function[2])
+                    expect(compiledTemplates.service.controller.function).to.deep.equal(expectedTemplates.service.controller.function)
                     expect(compiledTemplates.service.controller.functionB).to.deep.equal(expectedTemplates.service.controller.functionB)
                     
                     done();
                 })
-
         })
 
         it('should fail with incomplete templates', function (done) {
@@ -160,8 +150,8 @@ describe('paycheck', function () {
             brokenBaseTemplates[2].subTemplate.params.c.d.e = "<%= sub %" // break it
             paycheck.compile(brokenBaseTemplates, substitutions, contexts)
                 .then((compiledTemplates) => {
-                    expect(compiledTemplates.service.controller.function[0]).to.deep.equal(expectedTemplates.service.controller.function[0])
-                    expect(compiledTemplates.service.controller.function[1].subTemplate).to.deep.equal(
+                    expect(compiledTemplates.service.controller.function.myTemplate).to.deep.equal(expectedTemplates.service.controller.function.myTemplate)
+                    expect(compiledTemplates.service.controller.function.subTemplate).to.deep.equal(
                         {
                             jsonrpc: '2.0',
                             method: 'service.controller.function',
@@ -169,19 +159,17 @@ describe('paycheck', function () {
                             params: { "a": "<%=*%>", "c": { "d": { "e": "<%= sub %" } } }
                         }
                     )
-                    expect(compiledTemplates.service.controller.function[2]).to.deep.equal(expectedTemplates.service.controller.function[2])
+                    expect(compiledTemplates.service.controller.function.subCompTemplate).to.deep.equal(expectedTemplates.service.controller.function.subCompTemplate)
                     expect(compiledTemplates.service.controller.functionB).to.deep.equal(expectedTemplates.service.controller.functionB)
-                    
                     done();
                 })
-
         })
 
         it('should be able to substitute a template with a static substitution', function (done) {
             var subs = paycheck.mergeCompileData(substitutions)
             var substituted = paycheck.substituteTemplate(baseTemplates[2], subs, {});
 
-            expect(substituted).to.deep.equal(expectedTemplates.service.controller.function[1])
+            expect(substituted.subTemplate).to.deep.equal(expectedTemplates.service.controller.function.subTemplate)
 
             done();
 

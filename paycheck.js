@@ -59,12 +59,8 @@ var PayCheck = class PayCheck {
     substituteTemplates(templatesArr, substitutionsStatic) {
         return Promise.reduce(templatesArr, (p, c) => {
             var subbed = this.substituteTemplate(c, substitutionsStatic);
-            
             var path = _.flatMap(c)[0][this.opts.pathKey];
-            var arr = (_.get(p, path) || [])
-            arr.push(subbed)
-            _.set(p, path, arr)
-
+            _.set(p, path+"."+Object.keys(subbed)[0], _.flatMap(subbed)[0])
             return p;
         }, {})
     }
@@ -161,8 +157,8 @@ var PayCheck = class PayCheck {
 
         var toCheck = _.get(payloadTemplates, payload[this.opts.pathKey]);
         return !!toCheck && // return false if there is no template 
-            toCheck.some((v) => {
-                return this.match(payload, _.flatMap(v)[0]); // if there is a match, return true
+            _.values(toCheck).some((v) => {
+                return this.match(payload, v); // if there is a match, return true
             })
     }
 

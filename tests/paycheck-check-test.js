@@ -25,17 +25,15 @@ describe('paycheck', function () {
             var templates = {
                 service: {
                     controller: {
-                        function: [
-                            {
+                        function: 
+                            {  
                                 myTemplate:
                                 {
                                     jsonrpc: '2.0',
                                     method: 'service.controller.function',
                                     id: "<%=*%>",
                                     params: { "a": "<%=*%>", "c": { "d": { "e": ["f", "g"] } } }
-                                }
-                            },
-                            {
+                                },
                                 myOtherTemplate:
                                 {
                                     jsonrpc: '2.0',
@@ -44,7 +42,6 @@ describe('paycheck', function () {
                                     params: { "a": ["b", "z"], "c": { "d": { "e": "f" } } }
                                 }
                             }
-                        ]
                     }
                 }
             }
@@ -54,7 +51,7 @@ describe('paycheck', function () {
             expect(paycheck.check(jsonrpc, templates)).to.be.true
 
             checkSpy.should.have.been.calledOnce;
-            checkSpy.should.have.been.calledWith(jsonrpc, templates.service.controller.function[0].myTemplate)
+            checkSpy.should.have.been.calledWith(jsonrpc, templates.service.controller.function.myTemplate)
 
             checkSpy.restore();
 
@@ -73,26 +70,22 @@ describe('paycheck', function () {
             var templates = {
                 service: {
                     controller: {
-                        function: [
+                        function: {
+                            myTemplate:
                             {
-                                myTemplate:
-                                {
-                                    jsonrpc: '2.0',
-                                    method: 'service.controller.function',
-                                    id: "<%=*%>",
-                                    params: { "a": "z", "c": { "d": { "e": ["f", "g"] } } }
-                                }
-                            },
+                                jsonrpc: '2.0',
+                                method: 'service.controller.function',
+                                id: "<%=*%>",
+                                params: { "a": "z", "c": { "d": { "e": ["f", "g"] } } }
+                            },    
+                            myOtherTemplate:
                             {
-                                myOtherTemplate:
-                                {
-                                    jsonrpc: '2.0',
-                                    method: 'service.controller.function',
-                                    id: "<%=*%>",
-                                    params: { "a": ["b", "z"], "c": { "d": { "e": "f" } } }
-                                }
+                                jsonrpc: '2.0',
+                                method: 'service.controller.function',
+                                id: "<%=*%>",
+                                params: { "a": ["b", "z"], "c": { "d": { "e": "f" } } }
                             }
-                        ]
+                        }
                     }
                 }
             }
@@ -102,8 +95,8 @@ describe('paycheck', function () {
             expect(paycheck.check(jsonrpc, templates)).to.be.true
 
             checkSpy.should.have.been.calledTwice;
-            checkSpy.should.have.been.calledWith(jsonrpc, templates.service.controller.function[0].myTemplate)
-            checkSpy.should.have.been.calledWith(jsonrpc, templates.service.controller.function[1].myOtherTemplate)
+            checkSpy.should.have.been.calledWith(jsonrpc, templates.service.controller.function.myTemplate)
+            checkSpy.should.have.been.calledWith(jsonrpc, templates.service.controller.function.myOtherTemplate)
 
             checkSpy.restore();
 
@@ -121,26 +114,23 @@ describe('paycheck', function () {
             var templates = {
                 service: {
                     controller: {
-                        function: [
+                        function: {
+                            myTemplate:
                             {
-                                myTemplate:
-                                {
-                                    jsonrpc: '2.0',
-                                    method: 'service.controller.function',
-                                    id: "<%=*%>",
-                                    params: { "a": "z", "c": { "d": { "e": ["f", "g"] } } }
-                                }
+                                jsonrpc: '2.0',
+                                method: 'service.controller.function',
+                                id: "<%=*%>",
+                                params: { "a": "z", "c": { "d": { "e": ["f", "g"] } } }
                             },
+                            myOtherTemplate:
                             {
-                                myOtherTemplate:
-                                {
-                                    jsonrpc: '2.0',
-                                    method: 'service.controller.function',
-                                    id: "<%=*%>",
-                                    params: { "a": ["b", "z"], "c": { "d": { "e": "z" } } }
-                                }
+                                jsonrpc: '2.0',
+                                method: 'service.controller.function',
+                                id: "<%=*%>",
+                                params: { "a": ["b", "z"], "c": { "d": { "e": "z" } } }
                             }
-                        ]
+                        }
+                        
                     }
                 }
             }
@@ -150,8 +140,8 @@ describe('paycheck', function () {
             expect(paycheck.check(jsonrpc, templates)).to.be.false
 
             checkSpy.should.have.been.calledTwice;
-            checkSpy.should.have.been.calledWith(jsonrpc, templates.service.controller.function[0].myTemplate)
-            checkSpy.should.have.been.calledWith(jsonrpc, templates.service.controller.function[1].myOtherTemplate)
+            checkSpy.should.have.been.calledWith(jsonrpc, templates.service.controller.function.myTemplate)
+            checkSpy.should.have.been.calledWith(jsonrpc, templates.service.controller.function.myOtherTemplate)
 
             done();
         })
