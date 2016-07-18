@@ -1,6 +1,6 @@
 {
   "name": "paycheck",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "JSON payload authorization middleware",
   "main": "paycheck.js",
   "directories": {
