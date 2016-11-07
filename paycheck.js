@@ -92,7 +92,8 @@ var PayCheck = class PayCheck {
         // compare for equality - partially matching on any array defined in template
         return _.isEqualWith(payload, template, (p, t, k) => { // p - from payload, t - from template, k - key 
             if (_.isArray(t)) { // 
-                return _(p).compact() // if it is a single value eg "a", put it in an array: ["a"]. Does nothing if it is already in an array.
+                p = (_.isArray(p))? p : [p];
+                return _(p)  
                     .intersectionWith(t, _.isEqual) // finds common
                     .value().length == p.length; // 
             }
