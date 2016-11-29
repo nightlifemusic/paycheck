@@ -46,7 +46,16 @@ var baseTemplates = [
             id: "<%=*%>",
             params: { "a": "<%=*%>", "c": { "d": { "e": "<%= subComp %>", "f": "<%= subCompOther %>" } } }
         }
-    }
+    },
+    {
+        blank:
+        {
+            jsonrpc: '2.0',
+            method: 'service1.controller2.function3',
+            id: "<%=*%>",
+            params: {}
+        }
+    },
 ]
 
 Object.freeze(baseTemplates);
@@ -124,6 +133,19 @@ var expectedTemplates = {
                 }
             }
         }
+    },
+    service1: {
+        controller2: {
+            function3: {
+                blank:
+                {
+                    jsonrpc: '2.0',
+                    method: 'service1.controller2.function3',
+                    id: "<%=*%>",
+                    params: {}
+                }
+            }
+        }
     }
 }
 
@@ -139,7 +161,7 @@ describe('paycheck', function () {
                 .then((compiledTemplates) => {
                     expect(compiledTemplates.service.controller.function).to.deep.equal(expectedTemplates.service.controller.function)
                     expect(compiledTemplates.service.controller.functionB).to.deep.equal(expectedTemplates.service.controller.functionB)
-                    
+                    expect(compiledTemplates.service1.controller2.function3).to.deep.equal(expectedTemplates.service1.controller2.function3)
                     done();
                 })
         })
