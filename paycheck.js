@@ -15,6 +15,7 @@ var PayCheck = class PayCheck {
         this.isListening = false;
         this.observed = {};
         this.observedPaths = [];
+        this.log = logger;
     }
 
     compile(templatesArr, substitutionsArr, contextsArr) {
@@ -90,7 +91,7 @@ var PayCheck = class PayCheck {
         });
 
         // compare for equality - partially matching on any array defined in template
-        return _.isEqualWith(payload, template, (p, t, k) => { // p - from payload, t - from template, k - key 
+        let isMatch = _.isEqualWith(payload, template, (p, t, k) => { // p - from payload, t - from template, k - key 
             if (_.isArray(t)) { // 
                 p = (_.isArray(p))? p : [p];
                 return _(p)  
@@ -98,6 +99,10 @@ var PayCheck = class PayCheck {
                     .value().length == p.length; // 
             }
         })
+
+        if(!isMatch) this.log.error("paycheck cannot match ", JSON.stringify(payload), JSON.stringify(template))
+
+        return isMatch;
     }
 
     listenStart() {
