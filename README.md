@@ -94,7 +94,7 @@ The substitution would be defined in code by the application, eg:
 }
 ```
 
-And the context would need to also be provided:
+And the context may need to also be provided:
 
 ```js
 {
